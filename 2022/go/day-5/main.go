@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"strconv"
 	"strings"
 )
 
@@ -37,17 +38,11 @@ func reverseArray(arr []string) []string {
 	return arr
 }
 
-func main() {
-	f, _ := ioutil.ReadFile("input.txt")
+func getStacks(str string) []Stack {
+	str = strings.ReplaceAll(str, "[", " ")
+	str = strings.ReplaceAll(str, "]", " ")
 
-	file := string(f)
-
-	split := strings.Split(file, "\n\n")
-
-	split[0] = strings.ReplaceAll(split[0], "[", " ")
-	split[0] = strings.ReplaceAll(split[0], "]", " ")
-
-	drawing := strings.Split(split[0], "\n")
+	drawing := strings.Split(str, "\n")
 	drawing = reverseArray(drawing)
 	num := len(strings.ReplaceAll(drawing[0], " ", ""))
 	size := len(drawing[0])
@@ -72,5 +67,54 @@ func main() {
 	for i := 0; i < len(stacks); i++ {
 		fmt.Println(i+1, "=>", stacks[i])
 	}
+
+	return stacks
+
+}
+
+func getTopCrates(comands []string, stacks []Stack) string {
+	str := ""
+
+	for _, command := range comands {
+		commandParts := strings.Split(command, " ")
+		amount, _ := strconv.Atoi(commandParts[1])
+		origin, _ := strconv.Atoi(commandParts[3])
+		destiny, _ := strconv.Atoi(commandParts[5])
+		origin, destiny = origin-1, destiny-1
+
+		for i := 0; i < amount; i++ {
+			x, y := stacks[origin].Pop()
+			if y == true {
+				stacks[destiny].Push(x)
+			}
+		}
+
+	}
+
+	for _, stack := range stacks {
+		z, k := stack.Pop()
+		if k == true {
+			str += z
+		}
+	}
+
+	return str
+}
+
+func main() {
+	f, _ := ioutil.ReadFile("input.txt")
+
+	file := string(f)
+
+	split := strings.Split(file, "\n\n")
+
+	commands := strings.TrimSpace(split[1])
+	commandsArr := strings.Split(commands, "\n")
+
+	cratesStacks := getStacks(split[0])
+
+	topCrates := getTopCrates(commandsArr, cratesStacks)
+
+	fmt.Println("Puzzle 1:", topCrates)
 
 }
