@@ -31,6 +31,23 @@ func (s *Stack) Pop() (string, bool) {
 	}
 }
 
+func (s *Stack) PopMany(num int) (Stack, bool) {
+	if s.IsEmpty() {
+		return *s, false
+	} else {
+		index := len(*s) - num  // Get the index of the top most element.
+		element := (*s)[index:] // Index into the slice and obtain the elements.
+		*s = (*s)[:index]       // Remove it from the stack by slicing it off.
+		return element, true
+	}
+}
+
+func (s *Stack) AppendMany(stack Stack) {
+	for _, item := range stack {
+		*s = append(*s, item) // Simply append the new value to the end of the stack
+	}
+}
+
 func reverseArray(arr []string) []string {
 	for i, j := 0, len(arr)-1; i < j; i, j = i+1, j-1 {
 		arr[i], arr[j] = arr[j], arr[i]
@@ -62,10 +79,6 @@ func getStacks(str string) []Stack {
 				stacks[j].Push(rowStr)
 			}
 		}
-	}
-
-	for i := 0; i < len(stacks); i++ {
-		fmt.Println(i+1, "=>", stacks[i])
 	}
 
 	return stacks
@@ -101,6 +114,33 @@ func getTopCrates(comands []string, stacks []Stack) string {
 	return str
 }
 
+func getTopCrates2(comands []string, stacks []Stack) string {
+	str := ""
+
+	for _, command := range comands {
+		commandParts := strings.Split(command, " ")
+		amount, _ := strconv.Atoi(commandParts[1])
+		origin, _ := strconv.Atoi(commandParts[3])
+		destiny, _ := strconv.Atoi(commandParts[5])
+		origin, destiny = origin-1, destiny-1
+
+		x, y := stacks[origin].PopMany(amount)
+		if y == true {
+			stacks[destiny].AppendMany(x)
+		}
+
+	}
+
+	for _, stack := range stacks {
+		z, k := stack.Pop()
+		if k == true {
+			str += z
+		}
+	}
+
+	return str
+}
+
 func main() {
 	f, _ := ioutil.ReadFile("input.txt")
 
@@ -112,9 +152,12 @@ func main() {
 	commandsArr := strings.Split(commands, "\n")
 
 	cratesStacks := getStacks(split[0])
+	cratesStacks2 := getStacks(split[0])
 
 	topCrates := getTopCrates(commandsArr, cratesStacks)
+	topCrates2 := getTopCrates2(commandsArr, cratesStacks2)
 
 	fmt.Println("Puzzle 1:", topCrates)
+	fmt.Println("Puzzle 2:", topCrates2)
 
 }
