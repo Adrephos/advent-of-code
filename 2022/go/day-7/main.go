@@ -11,6 +11,7 @@ func createDirMap(commands string) map[string][]string {
 	commandsLines := strings.Split(strings.TrimSpace(commands), "\n")
 
 	var actualDir []string
+	var actualDirStr string
 	for _, line := range commandsLines {
 		if strings.HasPrefix(line, "$") {
 			commands := strings.Split(strings.TrimSpace(line), " ")
@@ -25,7 +26,7 @@ func createDirMap(commands string) map[string][]string {
 					actualDir = append(actualDir, commands[2])
 					actualDir = append(actualDir, "/")
 				}
-				actualDirStr := strings.Join(actualDir, "")
+				actualDirStr = strings.Join(actualDir, "")
 				fmt.Println(actualDir)
 				fmt.Println(actualDirStr)
 			}

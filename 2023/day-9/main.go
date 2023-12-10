@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"golang.org/x/exp/slices"
 )
 
 func getData(path string) [][]int {
@@ -32,25 +33,21 @@ func getSubSequence(seq []int) ([]int, bool) {
 	return subseq, allZeroes == len(subseq)
 }
 
-func nextValue(seq []int) int {
+func extraValueTR(seq []int, acc int) int {
 	subseq, allZeroes := getSubSequence(seq)
-	if allZeroes { return seq[0] }
+	if allZeroes { return seq[0] + acc }
 
-	return seq[len(seq)-1] + nextValue(subseq)
+	return extraValueTR(subseq, seq[len(seq)-1] + acc)
 }
 
-func prevValue(seq []int) int {
-	subseq, allZeroes := getSubSequence(seq)
-	if allZeroes { return seq[0] }
-
-	return seq[0] - prevValue(subseq)
-}
+func extraValue(seq []int) int { return extraValueTR(seq, 0) }
 
 func firstPuzzle(sequences [][]int) (int, int) {
 	first, second := 0, 0
 	for _, sequence := range sequences {
-		first += nextValue(sequence)
-		second += prevValue(sequence)
+		first += extraValue(sequence)
+		slices.Reverse(sequence)
+		second += extraValue(sequence)
 	}
 	return first, second
 }
